@@ -3,26 +3,27 @@
 #include <cstdio>
 
 struct PoorlyAlignedData {
-  char c;
-  uint16_t u;
-  double d;
-  int16_t i;
-};
+  char c;     // 0 (0 + 1 char + 1 pad)
+  uint16_t u; // 2 (2 + 2 uint16_t + 4 pad)
+  double d;   // 8 (8 + 8 double)
+  int16_t i;  // 16 (16 + 2 int16_t + 6 pad)
+}; // 24 (extra 11 bytes of padding)
 
 struct WellAlignedData {
-  double d;
-  uint16_t u;
-  int16_t i;
-  char c;
-};
+  double d;   // 0 (0 + 8 double)
+  uint16_t u; // 8 (8 + 2 uint16_t)
+  int16_t i;  // 10 (10 + 2 int16_t)
+  char c;     // 12 (12 + 1 char + 3 pad)
+}; // 16 (3 bytes of padding)
 
+// eliminate all padding
 #pragma pack(push, 1)
 struct PackedData {
   double d;
   uint16_t u;
   int16_t i;
   char c;
-};
+}; // 8 + 2 + 2 + 1 = 13
 #pragma pack(pop)
 
 int main() {
