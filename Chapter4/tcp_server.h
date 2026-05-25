@@ -1,5 +1,6 @@
 #pragma once
 
+#include "epoll_shim.h"
 #include "tcp_socket.h"
 
 namespace Common {

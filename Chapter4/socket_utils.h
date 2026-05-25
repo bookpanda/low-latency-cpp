@@ -151,8 +151,13 @@ inline auto join(int fd, const std::string &ip) -> bool {
 
     if (socket_cfg.is_listening_) {
       // bind to the specified port number.
-      const sockaddr_in addr{
-          AF_INET, htons(socket_cfg.port_), {htonl(INADDR_ANY)}, {}};
+      sockaddr_in addr{};
+#ifdef __APPLE__
+      addr.sin_len = sizeof(addr);
+#endif
+      addr.sin_family = AF_INET;
+      addr.sin_port = htons(socket_cfg.port_);
+      addr.sin_addr.s_addr = htonl(INADDR_ANY);
       ASSERT(bind(socket_fd,
                   socket_cfg.is_udp_
                       ? reinterpret_cast<const struct sockaddr *>(&addr)
