@@ -2,9 +2,7 @@
 
 class RuntimeExample {
 public:
-  virtual void placeOrder() {
-    printf("RuntimeExample::placeOrder()\n");
-  }
+  virtual void placeOrder() { printf("RuntimeExample::placeOrder()\n"); }
 };
 
 class SpecificRuntimeExample : public RuntimeExample {
@@ -14,16 +12,11 @@ public:
   }
 };
 
-template<typename actual_type>
-class CRTPExample {
+template <typename actual_type> class CRTPExample {
 public:
-  void placeOrder() {
-    static_cast<actual_type *>(this)->actualPlaceOrder();
-  }
+  void placeOrder() { static_cast<actual_type *>(this)->actualPlaceOrder(); }
 
-  void actualPlaceOrder() {
-    printf("CRTPExample::actualPlaceOrder()\n");
-  }
+  void actualPlaceOrder() { printf("CRTPExample::actualPlaceOrder()\n"); }
 };
 
 class SpecificCRTPExample : public CRTPExample<SpecificCRTPExample> {
@@ -37,7 +30,8 @@ int main(int, char **) {
   RuntimeExample *runtime_example = new SpecificRuntimeExample();
   runtime_example->placeOrder();
 
-  CRTPExample <SpecificCRTPExample> crtp_example;
+  // compile-time, better
+  CRTPExample<SpecificCRTPExample> crtp_example;
   crtp_example.placeOrder();
 
   return 0;
