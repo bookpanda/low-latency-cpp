@@ -1,11 +1,18 @@
 #pragma once
 
-#include <atomic>
-#include <iostream>
-#include <thread>
-#include <unistd.h>
+#if defined(__linux__) && !defined(_GNU_SOURCE)
+#define _GNU_SOURCE
+#endif
 
-#include <sys/syscall.h>
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include <thread>
+
+#include <pthread.h>
+
+#if defined(__linux__)
+#include <sched.h>
 
 namespace Common {
 /// Set affinity for current thread to be pinned to the provided core_id.
@@ -18,6 +25,26 @@ inline auto setThreadCore(int core_id) noexcept {
   return (pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset) ==
           0);
 }
+
+#elif defined(__APPLE__)
+
+namespace Common {
+/// macOS has no pthread_setaffinity_np equivalent; THREAD_AFFINITY_POLICY is
+/// static on current macOS and cannot pin threads to a specific core id.
+inline auto setThreadCore(int core_id) noexcept {
+  (void)core_id;
+  return true;
+}
+
+#else
+
+namespace Common {
+inline auto setThreadCore(int core_id) noexcept {
+  (void)core_id;
+  return true;
+}
+
+#endif
 
 /// Creates a thread instance, sets affinity on it, assigns it a name and
 /// passes the function to be run on that thread as well as the arguments to the
